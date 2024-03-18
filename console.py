@@ -119,14 +119,13 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
+        elif args.split()[0] not in HBNBCommand.classes:
+            print("** class doesn't exist **")
+            return
     
         args_list = args.split()
     
         class_name = args_list[0]
-        if class_name not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
-    
         kwargs = {}
         for arg in args_list[1:]:
             if '=' not in arg:
@@ -149,12 +148,18 @@ class HBNBCommand(cmd.Cmd):
                 except ValueError:
                     print(f"Invalid value for parameter: {key}. Skipping.")
                     continue
-            kwargs[key] = value
 
+            if key == '__class__':
+                print("Ignoring '__class__' parameter.")
+                continue
+            
+            kwargs[key] = value
+        
         new_instance = HBNBCommand.classes[class_name](**kwargs)
         storage.save()
         print(new_instance.id)
         storage.save()
+
         new_instance.updated_at = datetime.now()
 
     def help_create(self):
