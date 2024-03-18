@@ -150,11 +150,12 @@ class HBNBCommand(cmd.Cmd):
                     print(f"Invalid value for parameter: {key}. Skipping.")
                     continue
             kwargs[key] = value
-        kwargs['updated_at'] = datetime.now()
+
         new_instance = HBNBCommand.classes[class_name](**kwargs)
         storage.save()
         print(new_instance.id)
         storage.save()
+        new_instance.updated_at = datetime.now()
 
     def help_create(self):
         """ Help information for the create method """
