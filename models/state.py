@@ -11,6 +11,18 @@ storage_type = getenv("HBNB_TYPE_STORAGE")
 class State(BaseModel, Base):
     """ State class """
     __tablename__ = 'states'
-    name = Column(String(128), nullable=False)
-    if getenv('HBNB_TYPE_STORAGE') == 'db':
-        cities = relationship("City", backref="state", cascade="all, delete")
+    if storage_type == "db":
+        name = Column(String(128), nullable=False)
+        cities = relationship('City', cascade="all,delete", backref="state")
+    else:
+        name = ""
+        @property
+        def cities(self):
+            """getter for cities related to this state"""
+            from models import storage
+            citiesList = []
+            citiesAll = storage.all(City)
+            for city in citiesAll.values():
+                if city.state_id == self.id:
+                    citiesList.append(city)
+            return citiesList
