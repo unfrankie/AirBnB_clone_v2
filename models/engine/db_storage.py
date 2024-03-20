@@ -32,12 +32,16 @@ class DBStorage:
         """query on the current database session"""
         objs = {}
         if cls:
-            objs = self.__session.query(cls).all()
-            objs = {obj.__class__.__name__ + '.' + obj.id: obj for obj in objs}
+            all_cls = self.__session.query(cls).all()
+            for obj in all_cls:
+                key = f"{cls.__name__}.{obj.id}"
+                objs[key] = obj
         else:
             for c in [State, City, User, Place, Review, Amenity]:
-                objs.update({obj.__class__.__name__ + '.' + obj.id: obj for obj in
-                             self.__session.query(c).all()})
+                all_cls = self.__session.query(cls).all()
+                for obj in all_cls:
+                    key = f"{cls.__name__}.{obj.id}"
+                    objs[key] = obj
         return objs
 
     def new(self, obj):
