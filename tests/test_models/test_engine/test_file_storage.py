@@ -6,6 +6,10 @@ from models import storage
 import os
 
 
+@unittest.skipIf(
+    os.getenv("HBNB_TYPE_STORAGE") == "db",
+    "Test is not relevant for fileStorage"
+)
 class test_fileStorage(unittest.TestCase):
     """ Class to test the file storage method """
 
@@ -97,7 +101,9 @@ class test_fileStorage(unittest.TestCase):
     def test_key_format(self):
         """ Key is properly formatted """
         new = BaseModel()
+        new.save()
         _id = new.to_dict()['id']
+        temp = None
         for key in storage.all().keys():
             temp = key
         self.assertEqual(temp, 'BaseModel' + '.' + _id)
