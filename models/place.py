@@ -47,23 +47,23 @@ class Place(BaseModel, Base):
         latitude = 0.0
         longitude = 0.0
         amenity_ids = []
-        @property
 
-    def reviews(self):
-        """Getter for reviews related to this Place"""
-        from models import storage
-        reviews_list = [review for review in storage.all(Review).values() if review.place_id == self.id]
-        return reviews_list
-    
-    @property
-    def amenities(self):
-        """Getter for amenities related to this Place"""
-        from models import storage
-        amenities_list = [amenity for amenity in storage.all(Amenity).values() if self.id in amenity.amenity_ids]
-        return amenities_list
-    
-    @amenities.setter
-    def amenities(self, obj):
-        """Add an Amenity.id to the attribute amenity_ids"""
-        if isinstance(obj, Amenity):
-            self.amenity_ids.append(obj.id)
+      @property
+      def reviews(self):
+          """Getter for reviews related to this Place"""
+          from models import storage
+          reviews_list = [review for review in storage.all(Review).values() if review.place_id == self.id]
+          return reviews_list
+      
+      @property
+      def amenities(self):
+          """Getter for amenities related to this Place"""
+          from models import storage
+          amenities_list = [amenity for amenity in storage.all(Amenity).values() if self.id in amenity.amenity_ids]
+          return amenities_list
+      
+      @amenities.setter
+      def amenities(self, obj):
+          """Add an Amenity.id to the attribute amenity_ids"""
+          if isinstance(obj, Amenity):
+              self.amenity_ids.append(obj.id)
