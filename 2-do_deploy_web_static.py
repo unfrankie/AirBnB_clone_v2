@@ -17,8 +17,8 @@ def do_deploy(archive_path):
         if (
             put(archive_path, '/tmp/').failed or
             run('mkdir -p {}/'.format(folder)).failed or
-            run('tar -xzf /tmp/{} -C {}/'.format(file_name, folder)).failed or
-            run('rm /tmp/{}'.format(file_name)).failed or
+            run('tar -xzf /tmp/{} -C {}/'.format(filename, folder)).failed or
+            run('rm /tmp/{}'.format(filename)).failed or
             run('mv {}/web_static/* {}/'.format(folder, folder)).failed or
             run('rm -rf {}/web_static'.format(folder)).failed or
             run('rm -rf /data/web_static/current').failed or
