@@ -1,32 +1,40 @@
 # Setup web servers for deployment of AirBnb_clone
-package { 'nginx':
-  ensure => installed,
+exec {'update packages':
+  provider => shell,
+  command  => 'sudo apt-get update -y',
+  before   => Exec['install Nginx'],
 }
-file { '/data/web_static/releases/test':
-  ensure => directory,
+exec {'install Nginx':
+  provider => shell,
+  command  => 'sudo apt-get install nginx -y',
+  before   => Exec['create directory'],
 }
-file { '/data/web_static/shared':
-  ensure => directory,
+exec {'create directory':
+  provider => shell,
+  command  => 'sudo mkdir -p /data/web_static/{releases/test,shared}',
+  before   => Exec['html file'],
 }
-file { '/data/web_static/releases/test/index.html':
-  ensure  => file,
-  content => "<html><head></head><body>Dik lhdera dyal tberguigue rak 3lih nta o rbat</body></html>\n",
+exec {'html file':
+  provider => shell,
+  command  => 'echo "<html><head></head><body>Dik lhdera dyal tberguigue rak 3lih nta o rbat</body></html>" | sudo     tee /data/web_static/releases/test/index.html',
+  before   => Exec['symbolic link'],
 }
-file { '/data/web_static/current':
-  ensure => link,
-  target => '/data/web_static/releases/test',
+exec {'symbolic link':
+  provider => shell,
+  command  => 'sudo ln -sf /data/web_static/releases/test/ /data/web_static/current',
+  before   => Exec['change owner'],
 }
-file { '/data':
-  owner => 'ubuntu',
-  group => 'ubuntu',
-  recurse => true,
+exec {'change owner':
+  provider => shell,
+  command  => 'sudo chown -R ubuntu:ubuntu /data/',
+  before   => Exec['serve content'],
 }
-file { '/etc/nginx/sites-enabled/default':
-  ensure  => file,
-  content => "server {\n\tlisten 80 default_server;\n\tlisten [::]:80 default_server;\n\n\tlocation /hbnb_static {\n\t\talias /data/web_static/current/;\n\t}\n}\n",
-  notify  => Service['nginx'],
+exec {'serve content':
+  provider => shell,
+  command  => 'sudo sed -i '/listen 80 default_server/a location /hbnb_static { alias /data/web_static/current/;}'     /etc/nginx/sites-enabled/default',
+  before   => Exec['Restart Nginx services'],
 }
-service { 'nginx':
-  ensure  => running,
-  enable  => true,
+exec { 'Restart Nginx services':
+  provider => shell,
+  command  => 'sudo service nginx restart',
 }
