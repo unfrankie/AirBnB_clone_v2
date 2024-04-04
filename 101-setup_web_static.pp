@@ -1,44 +1,53 @@
 # Setup web servers for deployment of AirBnb_clone
-exec { 'apt-get-update':
-  command => '/usr/bin/apt-get update',
-}
-
 package { 'nginx':
   ensure => installed,
 }
-
-exec { 'create-directories':
-  command => '/usr/bin/mkdir -p /data/web_static/releases/test /data/web_static/shared',
+file { '/data':
+  ensure => 'directory',
+  owner  => 'ubuntu',
+  group  => 'ubuntu',
 }
-
+file { '/data/web_static':
+  ensure => 'directory',
+  owner  => 'ubuntu',
+  group  => 'ubuntu',
+}
+file { '/data/web_static/releases':
+  ensure => 'directory',
+  owner  => 'ubuntu',
+  group  => 'ubuntu',
+}
+file { '/data/web_static/shared':
+  ensure => 'directory',
+  owner  => 'ubuntu',
+  group  => 'ubuntu',
+}
+file { '/data/web_static/releases/test':
+  ensure => 'directory',
+  owner  => 'ubuntu',
+  group  => 'ubuntu',
+}
 file { '/data/web_static/releases/test/index.html':
-  ensure  => present,
-  content => 'ALX',
+  ensure  => 'file',
+  content => '<html>\n  <head>\n  </head>\n  <body>\n    Holberton School\n  </body>\n</html>\n',
+  owner   => 'ubuntu',
+  group   => 'ubuntu',
 }
-
-exec { 'remove-current-link':
-  command => '/usr/bin/rm -rf /data/web_static/current',
-}
-
 file { '/data/web_static/current':
-  ensure  => 'link',
-  target  => '/data/web_static/releases/test',
-  require => Exec['create-directories'],
+  ensure => 'link',
+  target => '/data/web_static/releases/test',
+  owner  => 'root',
+  group  => 'root',
 }
-
-exec { 'change-owner':
-  command => '/usr/bin/chown -R ubuntu:ubuntu /data/',
+file { '/etc/nginx/sites-available/default':
+  ensure  => 'file',
+  content => "server {\n\tlisten 80;\n\tlisten [::]:80;\n\tserver_name _;\n\n\tlocation /hbnb_static {\n\t\talias /data/web_static/current/;\n\t}\n}\n",
+  owner   => 'root',
+  group   => 'root',
+  notify  => Service['nginx'],
 }
-
-file_line { 'hbnb_static_config':
-  path    => '/etc/nginx/sites-enabled/default',
-  line    => '    location /hbnb_static { alias /data/web_static/current/; index index.html; }',
-  match   => '^server {',
-  after   => true,
-  notify  => Exec['restart-nginx'],
-}
-
-exec { 'restart-nginx':
-  command => '/usr/sbin/service nginx restart',
-  refreshonly => true,
+service { 'nginx':
+  ensure  => running,
+  enable  => true,
+  require => File['/etc/nginx/sites-available/default'],
 }
