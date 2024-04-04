@@ -1,40 +1,44 @@
 # Setup web servers for deployment of AirBnb_clone
-exec {'update packages':
-  provider => shell,
-  command  => 'sudo apt-get update -y',
-  before   => Exec['install Nginx'],
+exec { 'apt-get-update':
+  command => '/usr/bin/apt-get update',
 }
-exec {'install Nginx':
-  provider => shell,
-  command  => 'sudo apt-get install nginx -y',
-  before   => Exec['create directory'],
+
+package { 'nginx':
+  ensure => installed,
 }
-exec {'create directory':
-  provider => shell,
-  command  => 'sudo mkdir -p /data/web_static/{releases/test,shared}',
-  before   => Exec['html file'],
+
+exec { 'create-directories':
+  command => '/usr/bin/mkdir -p /data/web_static/releases/test /data/web_static/shared',
 }
-exec {'html file':
-  provider => shell,
-  command  => 'echo "<html><head></head><body>Dik lhdera dyal tberguigue rak 3lih nta o rbat</body></html>" | sudo     tee /data/web_static/releases/test/index.html',
-  before   => Exec['symbolic link'],
+
+file { '/data/web_static/releases/test/index.html':
+  ensure  => present,
+  content => 'ALX',
 }
-exec {'symbolic link':
-  provider => shell,
-  command  => 'sudo ln -sf /data/web_static/releases/test/ /data/web_static/current',
-  before   => Exec['change owner'],
+
+exec { 'remove-current-link':
+  command => '/usr/bin/rm -rf /data/web_static/current',
 }
-exec {'change owner':
-  provider => shell,
-  command  => 'sudo chown -R ubuntu:ubuntu /data/',
-  before   => Exec['serve content'],
+
+file { '/data/web_static/current':
+  ensure  => 'link',
+  target  => '/data/web_static/releases/test',
+  require => Exec['create-directories'],
 }
-exec {'serve content':
-  provider => shell,
-  command  => 'sudo sed -i '/listen 80 default_server/a location /hbnb_static { alias /data/web_static/current/;}'     /etc/nginx/sites-enabled/default',
-  before   => Exec['Restart Nginx services'],
+
+exec { 'change-owner':
+  command => '/usr/bin/chown -R ubuntu:ubuntu /data/',
 }
-exec { 'Restart Nginx services':
-  provider => shell,
-  command  => 'sudo service nginx restart',
+
+file_line { 'hbnb_static_config':
+  path    => '/etc/nginx/sites-enabled/default',
+  line    => '    location /hbnb_static { alias /data/web_static/current/; index index.html; }',
+  match   => '^server {',
+  after   => true,
+  notify  => Exec['restart-nginx'],
+}
+
+exec { 'restart-nginx':
+  command => '/usr/sbin/service nginx restart',
+  refreshonly => true,
 }
