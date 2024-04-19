@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 """ Place Module for HBNB project """
+import models
+import sqlalchemy
 from models.base_model import BaseModel, Base
 from models.review import Review
 from models.amenity import Amenity
