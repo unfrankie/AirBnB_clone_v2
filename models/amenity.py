@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 """ State Module for HBNB project """
+import models
+import sqlalchemy
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
@@ -20,3 +22,7 @@ class Amenity(BaseModel, Base):
         )
     else:
         name = ""
+
+    def __init__(self, *args, **kwargs):
+        """initializes Amenity"""
+        super().__init__(*args, **kwargs)
