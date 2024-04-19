@@ -20,7 +20,7 @@ place_amenity = Table('place_amenity', Base.metadata,
                           )
 
 class Place(BaseModel, Base):
-    """ A place to stay """
+    """A place to stay"""
     __tablename__ = 'places'
 
     if storage_type == "db":
@@ -35,8 +35,8 @@ class Place(BaseModel, Base):
         latitude = Column(Float, nullable=True)
         longitude = Column(Float, nullable=True)
         reviews = relationship('Review', cascade="all,delete", backref="place")
-        amenities = relationship('Amenity', secondary='place_amenity', viewonly=False,
-                                 back_populates='place_amenities')
+        amenities = relationship('Amenity', secondary=place_amenity, viewonly=False,
+                                 backref='places')
     else:
         city_id = ""
         user_id = ""
@@ -51,7 +51,7 @@ class Place(BaseModel, Base):
         amenity_ids = []
 
     def __init__(self, *args, **kwargs):
-        """initializes Place"""
+        """Initializes Place"""
         super().__init__(*args, **kwargs)
 
         @property
