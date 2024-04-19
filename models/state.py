@@ -23,7 +23,7 @@ class State(BaseModel, Base):
         """initializes state"""
         super().__init__(*args, **kwargs)
 
-    if models.storage_t != "db":
+    if storage_type != "db":
         @property
         def cities(self):
             """Getter for cities related to this state"""
