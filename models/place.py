@@ -7,6 +7,10 @@ import sqlalchemy
 from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
 
+
+storage_type = getenv("HBNB_TYPE_STORAGE")
+
+
 if models.storage_type == 'db':
     place_amenity = Table('place_amenity', Base.metadata,
                           Column('place_id', String(60),
