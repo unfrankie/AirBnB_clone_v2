@@ -48,6 +48,10 @@ class Place(BaseModel, Base):
         longitude = 0.0
         amenity_ids = []
 
+    def __init__(self, *args, **kwargs):
+        """initializes Place"""
+        super().__init__(*args, **kwargs)
+
         @property
         def reviews(self):
             """Getter for reviews related to this Place"""
